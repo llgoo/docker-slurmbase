@@ -65,6 +65,10 @@ RUN yum -y update && \
     rm -rf /var/cache/yum/*
 
 
+# Create user `munge`
+RUN groupadd -g 981 munge && \
+    useradd  -m -d /var/lib/munge -u 981 -g munge  -s /sbin/nologin munge
+
 # Install munge
 RUN wget https://github.com/dun/munge/releases/download/munge-${MUNGE_VERSION}/munge-${MUNGE_VERSION}.tar.xz && \
     rpmbuild -tb --clean munge-${MUNGE_VERSION}.tar.xz && \ 
@@ -75,8 +79,8 @@ RUN wget https://github.com/dun/munge/releases/download/munge-${MUNGE_VERSION}/m
 
 # Configure munge (for SLURM authentication)
 ADD etc/munge/munge.key /etc/munge/munge.key
-RUN chown root /var/lib/munge && \
-    chown root /etc/munge && chmod 600 /var/run/munge && \
+RUN chown munge:munge /var/lib/munge && \
+    chown munge:munge /etc/munge && chmod 600 /var/run/munge && \
     chmod 755 /run/munge && \
     chmod 600 /etc/munge/munge.key
 ADD etc/supervisord.d/munged.ini /etc/supervisord.d/munged.ini
