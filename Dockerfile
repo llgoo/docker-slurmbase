@@ -80,6 +80,7 @@ RUN wget https://github.com/dun/munge/releases/download/munge-${MUNGE_VERSION}/m
 # Configure munge (for SLURM authentication)
 ADD etc/munge/munge.key /etc/munge/munge.key
 RUN chown munge:munge /var/lib/munge && \
+    chown munge:munge /etc/munge/munge.key && \
     chown munge:munge /etc/munge && chmod 600 /var/run/munge && \
     chmod 755 /run/munge && \
     chmod 600 /etc/munge/munge.key
@@ -90,8 +91,8 @@ RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
     rpmbuild -ta --clean slurm-${SLURM_VERSION}.tar.bz2 && \
     rm -f slurm-${SLURM_VERSION}.tar.bz2
 # slurm.conf should be Identical across cluster
-ADD etc/slurm/slurm.conf /usr/local/etc/slurm.conf
-ADD etc/slurm/acct_gather.conf /usr/local/etc/acct_gather.conf
+ADD etc/slurm/slurm.conf /etc/slurm/slurm.conf
+ADD etc/slurm/acct_gather.conf /etc/slurm/acct_gather.conf
 
 # Install Lmod
 RUN wget https://sourceforge.net/projects/lmod/files/Lmod-${LMOD_VERSION}.tar.bz2 && \
@@ -113,15 +114,15 @@ RUN groupadd -g 983 modules && \
     chmod a+rx ${MODULES_DIR}
 ADD etc/profile.d/z01_EasyBuild.sh /etc/profile.d/z01_EasyBuild.sh
 
-# # Configure OpenSSH
-# # Also see: https://docs.docker.com/engine/examples/running_ssh_service/
-# ENV NOTVISIBLE "in users profile"
-# RUN echo "export VISIBLE=now" >> /etc/profile
-# RUN mkdir /var/run/sshd
-# RUN echo 'ddhpc:ddhpc' | chpasswd
-# # SSH login fix. Otherwise user is kicked off after login
-# RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
-# ADD etc/supervisord.d/sshd.conf /etc/supervisor/conf.d/sshd.conf
+# Configure OpenSSH
+# Also see: https://docs.docker.com/engine/examples/running_ssh_service/
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+RUN mkdir /var/run/sshd
+RUN echo 'dev:dev' | chpasswd
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+ADD etc/ssh/sshd_config /etc/ssh/sshd_config
 ADD etc/supervisord.d/sshd.ini /etc/supervisord.d/sshd.ini
 
 EXPOSE 22
