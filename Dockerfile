@@ -79,7 +79,7 @@ RUN chown root /var/lib/munge && \
     chown root /etc/munge && chmod 600 /var/run/munge && \
     chmod 755 /run/munge && \
     chmod 600 /etc/munge/munge.key
-ADD etc/supervisord.d/munged.conf /etc/supervisor/conf.d/munged.conf
+ADD etc/supervisord.d/munged.ini /etc/supervisord.d/munged.ini
 
 # Build Slurm-* rpm packages ready for variant to pick and install
 RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
@@ -118,6 +118,6 @@ ADD etc/profile.d/z01_EasyBuild.sh /etc/profile.d/z01_EasyBuild.sh
 # # SSH login fix. Otherwise user is kicked off after login
 # RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 # ADD etc/supervisord.d/sshd.conf /etc/supervisor/conf.d/sshd.conf
-ADD etc/supervisord.d/sshd.conf /etc/supervisor/conf.d/sshd.conf
+ADD etc/supervisord.d/sshd.ini /etc/supervisord.d/sshd.ini
 
 EXPOSE 22
