@@ -1,3 +1,5 @@
 Host *
+   IdentityFile ~/.ssh/dev
+   ForwardAgent yes
    StrictHostKeyChecking no
    UserKnownHostsFile=/dev/null
