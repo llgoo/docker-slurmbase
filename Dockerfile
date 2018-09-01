@@ -124,5 +124,7 @@ RUN echo 'dev:dev' | chpasswd
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 ADD etc/ssh/sshd_config /etc/ssh/sshd_config
 ADD etc/supervisord.d/sshd.ini /etc/supervisord.d/sshd.ini
+RUN cd /etc/ssh/ && \
+    ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ''
 
 EXPOSE 22
