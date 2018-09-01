@@ -93,6 +93,7 @@ RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
 # slurm.conf should be Identical across cluster
 ADD etc/slurm/slurm.conf /etc/slurm/slurm.conf
 ADD etc/slurm/acct_gather.conf /etc/slurm/acct_gather.conf
+ADD etc/slurm/cgroup.conf /etc/slurm/cgroup.conf
 
 # Install Lmod
 RUN wget https://sourceforge.net/projects/lmod/files/Lmod-${LMOD_VERSION}.tar.bz2 && \
