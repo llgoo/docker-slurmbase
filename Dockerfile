@@ -36,7 +36,7 @@ RUN chown -R ${USER_DEV}:wheel /home/${USER_DEV} && \
 # readline-devel, openssl, perl-ExtUtils-MakeMaker, pam-devel, mysql-devel needed by slurm
 # lua-posix lua lua-filesystem lua-devel tcl needed by Lmod
 # which needed by easybuild
-# wget, net-tools for debugging
+# wget, net-tools, bind-tools(nslookup), telnet for debugging
 RUN yum -y update && \
     yum -y install epel-release && \
     yum -y groupinstall "Development Tools" && \
@@ -60,6 +60,8 @@ RUN yum -y update && \
     tcl \
     which \
     net-tools \
+    telnet \
+    bind-utils \
     && \
     yum clean all && \
     rm -rf /var/cache/yum/*
