@@ -105,11 +105,6 @@ ADD etc/supervisord.d/munged.ini /etc/supervisord.d/munged.ini
 RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
     rpmbuild -ta --clean slurm-${SLURM_VERSION}.tar.bz2 && \
     rm -f slurm-${SLURM_VERSION}.tar.bz2
-# slurm.conf should be Identical across cluster
-ADD etc/slurm/slurm.conf /etc/slurm/slurm.conf
-#ADD etc/slurm/acct_gather.conf /etc/slurm/acct_gather.conf
-ADD etc/slurm/cgroup.conf /etc/slurm/cgroup.conf
-ADD etc/slurm/cgroup_allowed_devices_file.conf /etc/slurm/cgroup_allowed_devices_file.conf
 
 # Install Lmod
 RUN wget https://sourceforge.net/projects/lmod/files/Lmod-${LMOD_VERSION}.tar.bz2 && \
@@ -143,5 +138,7 @@ ADD etc/ssh/sshd_config /etc/ssh/sshd_config
 ADD etc/supervisord.d/sshd.ini /etc/supervisord.d/sshd.ini
 RUN cd /etc/ssh/ && \
     ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ''
+
+VOLUME [ "/etc/slurm" ]
 
 EXPOSE 22
