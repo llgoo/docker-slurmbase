@@ -125,6 +125,10 @@ ADD etc/supervisord.d/sshd.ini /etc/supervisord.d/sshd.ini
 RUN cd /etc/ssh/ && \
     ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ''
 
+# Configure supervisord as one of systemd service
+ADD etc/systemd/system/supervisord.service /etc/systemd/system/supervisord.service 
+RUN chmod 664 /etc/systemd/system/supervisord.service
+
 VOLUME [ "/etc/slurm" ]
 
 EXPOSE 22
