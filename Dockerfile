@@ -65,8 +65,8 @@ RUN yum -y update && \
     rm -rf /var/cache/yum/*
 
 # Create user `munge`
-RUN groupadd -g 981 munge && \
-    useradd  -m -d /var/lib/munge -u 981 -g munge  -s /sbin/nologin munge
+RUN groupadd -g 983 munge && \
+    useradd  -m -d /var/lib/munge -u 983 -g munge  -s /sbin/nologin munge
 
 # Install munge
 RUN wget https://github.com/dun/munge/releases/download/munge-${MUNGE_VERSION}/munge-${MUNGE_VERSION}.tar.xz && \
@@ -103,9 +103,9 @@ RUN wget https://sourceforge.net/projects/lmod/files/Lmod-${LMOD_VERSION}.tar.bz
 
 # Create Modules user & Easybuild init script. Practices by dtu.dk
 # https://wiki.fysik.dtu.dk/niflheim/EasyBuild_modules#installing-easybuild specify MODULES_HOME
-RUN groupadd -g 983 modules && \
+RUN groupadd -g 984 modules && \
     mkdir -p $MODULES_DIR && \
-    useradd -m -c "Modules user" -d $MODULES_DIR -u 983 -g modules -s /bin/bash modules && \
+    useradd -m -c "Modules user" -d $MODULES_DIR -u 984 -g modules -s /bin/bash modules && \
     chown -R modules:modules ${MODULES_DIR} && \
     chmod a+rx ${MODULES_DIR}
 ADD bootstrap/etc/profile.d/z01_EasyBuild.sh /etc/profile.d/z01_EasyBuild.sh
