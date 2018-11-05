@@ -103,7 +103,7 @@ RUN wget https://sourceforge.net/projects/lmod/files/Lmod-${LMOD_VERSION}.tar.bz
 
 # Create Modules user & Easybuild init script. Practices by dtu.dk
 # https://wiki.fysik.dtu.dk/niflheim/EasyBuild_modules#installing-easybuild specify MODULES_HOME
-RUN groupadd -g 981 modules && \
+RUN groupadd -g 983 modules && \
     mkdir -p $MODULES_DIR && \
     useradd -m -c "Modules user" -d $MODULES_DIR -u 983 -g modules -s /bin/bash modules && \
     chown -R modules:modules ${MODULES_DIR} && \
