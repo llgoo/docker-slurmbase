@@ -42,7 +42,6 @@ RUN yum -y update && \
     wget \
     ntp \
     openssh-server \
-    supervisor \
     bzip2-devel \
     openssl-devel \
     zlib-devel \
@@ -64,6 +63,8 @@ RUN yum -y update && \
     yum clean all && \
     rm -rf /var/cache/yum/*
 
+RUN systemctl enable sshd
+
 # Create user `munge`
 RUN groupadd -g 983 munge && \
     useradd  -m -d /var/lib/munge -u 983 -g munge  -s /sbin/nologin munge
@@ -82,8 +83,8 @@ RUN chown munge:munge /var/lib/munge && \
     chown munge:munge /etc/munge/munge.key && \
     chown munge:munge /etc/munge && chmod 600 /var/run/munge && \
     chmod 755 /run/munge && \
-    chmod 600 /etc/munge/munge.key
-ADD bootstrap/etc/supervisord.d/munged.ini /etc/supervisord.d/munged.ini
+    chmod 600 /etc/munge/munge.key && \
+    systemctl enable munge
 
 # Build Slurm-* rpm packages ready for variant to pick and install
 RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
@@ -109,26 +110,6 @@ RUN groupadd -g 984 modules && \
     chown -R modules:modules ${MODULES_DIR} && \
     chmod a+rx ${MODULES_DIR}
 ADD bootstrap/etc/profile.d/z01_EasyBuild.sh /etc/profile.d/z01_EasyBuild.sh
-
-# Configure OpenSSH
-# Also see: https://docs.docker.com/engine/examples/running_ssh_service/
-# ENV NOTVISIBLE "in users profile"
-# RUN echo "export VISIBLE=now" >> /etc/profile
-# RUN mkdir /var/run/sshd
-# RUN echo 'dev:dev' | chpasswd
-# # SSH login fix. Otherwise user is kicked off after login
-# RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
-# ADD etc/ssh/sshd_config /etc/ssh/sshd_config
-# ADD etc/supervisord.d/sshd.ini /etc/supervisord.d/sshd.ini
-# RUN cd /etc/ssh/ && \
-#     ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ''
-# ^---
-# Comment out for simplisity of sshd service.
-
-# Configure supervisord as one of systemd service, enable at boot
-ADD bootstrap/etc/supervisord.service /etc/systemd/system/supervisord.service 
-RUN chmod 664 /etc/systemd/system/supervisord.service && \
-    ln -s /etc/systemd/system/supervisord.service /etc/systemd/system/multi-user.target.wants/supervisord.service
 
 VOLUME [ "/etc/slurm" ]
 
