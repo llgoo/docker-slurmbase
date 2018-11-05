@@ -2,28 +2,27 @@ FROM centos/systemd:latest
 
 LABEL maintainer="oatkrittin@gmail.com"
 
-ENV SLURM_VERSION=17.11.9-2 \
+ENV SLURM_VERSION=18.08.3 \
     MUNGE_VERSION=0.5.13 \
     LMOD_VERSION=7.8 \
-    USER_DEV=dev \
+    USER_DEV=ansible \
     ROOT_HOME=/root \
     ROOT_RPMS=/root/rpmbuild/RPMS/x86_64 \
     APPS_ROOT_PATH=/opt/apps \
     MODULES_DIR=/home/modules \
-    EASYBUILD_PREFIX=home/modules
+    EASYBUILD_PREFIX=/home/modules
 
 WORKDIR ${ROOT_HOME} 
 # Create users, set up SSH keys (for MPI), add sudoers
 # -r for system account, -s for route shell to none bash one, -m for make home.
 # Explicitly state UID & GID for synchronsization across cluster 
-ADD etc/sudoers /etc/sudoers
-RUN groupadd -r -g 3333 slurm && \
-    useradd -r -u 3333 -g 3333 -s /bin/false slurm && \
-    useradd -u 6666 -ms /bin/bash $USER_DEV && \
+RUN groupadd -r -g 982 slurm && \
+    useradd -r -u 982 -g 982 -s /bin/false slurm && \
+    useradd -u 3333 -ms /bin/bash $USER_DEV && \
     usermod -aG wheel $USER_DEV
 
 # Add .ssh and correct permissions.
-ADD home/${USER_DEV}/ssh /home/${USER_DEV}/.ssh
+ADD bootstrap/${USER_DEV}/.ssh /home/${USER_DEV}/.ssh
 RUN chown -R ${USER_DEV}:wheel /home/${USER_DEV} && \
     chmod 700 /home/${USER_DEV}/.ssh && \
     chmod 600 /home/${USER_DEV}/.ssh/*
@@ -65,7 +64,6 @@ RUN yum -y update && \
     yum clean all && \
     rm -rf /var/cache/yum/*
 
-
 # Create user `munge`
 RUN groupadd -g 981 munge && \
     useradd  -m -d /var/lib/munge -u 981 -g munge  -s /sbin/nologin munge
@@ -79,13 +77,13 @@ RUN wget https://github.com/dun/munge/releases/download/munge-${MUNGE_VERSION}/m
     rm -f munge-${MUNGE_VERSION}.tar.xz 
 
 # Configure munge (for SLURM authentication)
-ADD etc/munge/munge.key /etc/munge/munge.key
+ADD bootstrap/etc/munge/munge.key /etc/munge/munge.key
 RUN chown munge:munge /var/lib/munge && \
     chown munge:munge /etc/munge/munge.key && \
     chown munge:munge /etc/munge && chmod 600 /var/run/munge && \
     chmod 755 /run/munge && \
     chmod 600 /etc/munge/munge.key
-ADD etc/supervisord.d/munged.ini /etc/supervisord.d/munged.ini
+ADD bootstrap/etc/supervisord.d/munged.ini /etc/supervisord.d/munged.ini
 
 # Build Slurm-* rpm packages ready for variant to pick and install
 RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
@@ -105,28 +103,30 @@ RUN wget https://sourceforge.net/projects/lmod/files/Lmod-${LMOD_VERSION}.tar.bz
 
 # Create Modules user & Easybuild init script. Practices by dtu.dk
 # https://wiki.fysik.dtu.dk/niflheim/EasyBuild_modules#installing-easybuild specify MODULES_HOME
-RUN groupadd -g 983 modules && \
+RUN groupadd -g 981 modules && \
     mkdir -p $MODULES_DIR && \
     useradd -m -c "Modules user" -d $MODULES_DIR -u 983 -g modules -s /bin/bash modules && \
     chown -R modules:modules ${MODULES_DIR} && \
     chmod a+rx ${MODULES_DIR}
-ADD etc/profile.d/z01_EasyBuild.sh /etc/profile.d/z01_EasyBuild.sh
+ADD bootstrap/etc/profile.d/z01_EasyBuild.sh /etc/profile.d/z01_EasyBuild.sh
 
 # Configure OpenSSH
 # Also see: https://docs.docker.com/engine/examples/running_ssh_service/
-ENV NOTVISIBLE "in users profile"
-RUN echo "export VISIBLE=now" >> /etc/profile
-RUN mkdir /var/run/sshd
-RUN echo 'dev:dev' | chpasswd
-# SSH login fix. Otherwise user is kicked off after login
-RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
-ADD etc/ssh/sshd_config /etc/ssh/sshd_config
-ADD etc/supervisord.d/sshd.ini /etc/supervisord.d/sshd.ini
-RUN cd /etc/ssh/ && \
-    ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ''
+# ENV NOTVISIBLE "in users profile"
+# RUN echo "export VISIBLE=now" >> /etc/profile
+# RUN mkdir /var/run/sshd
+# RUN echo 'dev:dev' | chpasswd
+# # SSH login fix. Otherwise user is kicked off after login
+# RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+# ADD etc/ssh/sshd_config /etc/ssh/sshd_config
+# ADD etc/supervisord.d/sshd.ini /etc/supervisord.d/sshd.ini
+# RUN cd /etc/ssh/ && \
+#     ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ''
+# ^---
+# Comment out for simplisity of sshd service.
 
 # Configure supervisord as one of systemd service, enable at boot
-ADD etc/systemd/system/supervisord.service /etc/systemd/system/supervisord.service 
+ADD bootstrap/etc/supervisord.service /etc/systemd/system/supervisord.service 
 RUN chmod 664 /etc/systemd/system/supervisord.service && \
     ln -s /etc/systemd/system/supervisord.service /etc/systemd/system/multi-user.target.wants/supervisord.service
 

@@ -1,4 +1,0 @@
-AllowAgentForwarding yes
-PermitRootLogin no
-AllowUsers dev
-Port 22
