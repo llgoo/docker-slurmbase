@@ -2,7 +2,7 @@ FROM centos/systemd:latest
 
 LABEL maintainer="oatkrittin@gmail.com"
 
-ENV SLURM_VERSION=18.08.3
+ENV SLURM_VERSION=18.08.3-1
 ENV MUNGE_VERSION=0.5.13
 ENV LMOD_VERSION=7.8
 ENV USER_DEV=ansible
