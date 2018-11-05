@@ -2,15 +2,14 @@ FROM centos/systemd:latest
 
 LABEL maintainer="oatkrittin@gmail.com"
 
-ENV SLURM_VERSION=18.08.3 \
-    MUNGE_VERSION=0.5.13 \
-    LMOD_VERSION=7.8 \
-    USER_DEV=ansible \
-    ROOT_HOME=/root \
-    ROOT_RPMS=/root/rpmbuild/RPMS/x86_64 \
-    APPS_ROOT_PATH=/opt/apps \
-    MODULES_DIR=/home/modules \
-    EASYBUILD_PREFIX=/home/modules
+ENV SLURM_VERSION=18.08.3
+ENV MUNGE_VERSION=0.5.13
+ENV LMOD_VERSION=7.8
+ENV USER_DEV=ansible
+ENV ROOT_HOME=/root
+ENV ROOT_RPMS=/root/rpmbuild/RPMS/x86_64
+ENV APPS_ROOT_PATH=/opt/apps
+ENV MODULES_DIR=/home/modules
 
 WORKDIR ${ROOT_HOME} 
 # Create users, set up SSH keys (for MPI), add sudoers
