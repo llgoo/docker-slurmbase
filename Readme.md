@@ -9,14 +9,12 @@ Slurm Version 18.08.3
  - sshd
  - lmod
  - preparation for Lmod & EasyBuild
- 
-============================  =====================  =====================
-Plugins                       Dependencies            Built in RPMs
-============================  =====================  =====================
-**MUNGE**                     ``munge-devel``          yes
-**PAM Support**               ``pam-devel``            yes
-**cgroup Task Affinity**      ``hwloc-devel``          yes
-**IPMI Engergy Consumption**  ``freeimpi-devel``       no
-**Lua Support**               ``lua-devel``            yes
-**My SQL Support**            ``mysql-devel``          yes
-============================  =====================  =====================
+
+| Plugins                 | Dependencies     | Built in RPMs |
+|------------------------:|:----------------:|--------------:|
+| MUNGE                   | `munge-devel`    |    yes        |
+| PAM Support             | `pam-devel`      |    yes        |
+| cgroup Task Affinity    | `hwloc-devel`    |    yes        |
+| IPMI Energy Consumption | `freeimpi-devel` |    no         |
+| Lua Support             | `lua-devel`      |    yes        |
+| MySql Support           | `mysql-devel`    |    yes        |
