@@ -24,7 +24,8 @@ RUN groupadd -r -g 982 slurm && \
 ADD bootstrap/${USER_DEV}/.ssh /home/${USER_DEV}/.ssh
 RUN chown -R ${USER_DEV}:wheel /home/${USER_DEV} && \
     chmod 700 /home/${USER_DEV}/.ssh && \
-    chmod 600 /home/${USER_DEV}/.ssh/*
+    chmod 644 /home/${USER_DEV}/.ssh/* && \
+    chmod 600 /home/${USER_DEV}/.ssh/id_rsa
 
 # Install dependencies
 # epel-repository
