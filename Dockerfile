@@ -56,7 +56,6 @@ RUN yum -y update && \
     lua \
     lua-filesystem \
     lua-devel \
-    libpmi \
     tcl \
     which \
     net-tools \
