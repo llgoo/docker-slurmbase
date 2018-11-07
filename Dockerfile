@@ -31,7 +31,7 @@ RUN chown -R ${USER_DEV}:wheel /home/${USER_DEV} && \
 # epel-repository
 # Development Tools included gcc, gcc-c++, rpm-guild, git, svn, etc.
 # bzip2-devel, openssl-devel, zlib-devel needed by munge
-# readline-devel, openssl, perl-ExtUtils-MakeMaker, pam-devel, mysql-devel, hwloc-devel needed by slurm
+# readline-devel, openssl, perl-ExtUtils-MakeMaker, pam-devel, libpmi, mysql-devel, hwloc-devel needed by slurm
 # lua-posix lua lua-filesystem lua-devel tcl needed by Lmod
 # which needed by easybuild
 # wget, net-tools, bind-tools(nslookup), telnet for debugging
@@ -50,11 +50,13 @@ RUN yum -y update && \
     perl-ExtUtils-MakeMaker \
     hwloc-devel \
     pam-devel \
+    pmix-devel \
     mysql-devel \
     lua-posix \
     lua \
     lua-filesystem \
     lua-devel \
+    libpmi \
     tcl \
     which \
     net-tools \
