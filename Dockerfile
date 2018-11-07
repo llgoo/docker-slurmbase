@@ -49,13 +49,8 @@ RUN yum -y update && \
     perl-ExtUtils-MakeMaker \
     hwloc-devel \
     pam-devel \
-    pmix-devel \
     mysql-devel \
-    lua-posix \
-    lua \
-    lua-filesystem \
-    lua-devel \
-    tcl \
+    pmix-devel \
     which \
     net-tools \
     telnet \
@@ -92,6 +87,17 @@ RUN chown munge:munge /var/lib/munge && \
 RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
     rpmbuild -ta --clean slurm-${SLURM_VERSION}.tar.bz2 && \
     rm -f slurm-${SLURM_VERSION}.tar.bz2
+
+RUN yum -y install epel-release && \
+    yum -y install \
+    lua-posix \
+    lua \
+    lua-filesystem \
+    lua-devel \
+    tcl \
+    && \
+    yum clean all && \
+    rm -rf /var/cache/yum/*
 
 # Install Lmod
 RUN wget https://sourceforge.net/projects/lmod/files/Lmod-${LMOD_VERSION}.tar.bz2 && \
