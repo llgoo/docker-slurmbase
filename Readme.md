@@ -8,6 +8,7 @@ Slurm Version 18.08.3
  - munged
  - sshd
  - lmod
+ - pmix
  - preparation for Lmod & EasyBuild
 
 | Plugins                 | Dependencies     | Built in RPMs |
@@ -18,3 +19,4 @@ Slurm Version 18.08.3
 | IPMI Energy Consumption | `freeimpi-devel` |    no         |
 | Lua Support             | `lua-devel`      |    yes        |
 | MySql Support           | `mysql-devel`    |    yes        |
+| Pmix Support            | `pmix-devel`     |    yes        |
