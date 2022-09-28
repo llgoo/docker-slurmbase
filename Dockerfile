@@ -1,10 +1,10 @@
 FROM centos/systemd:latest
 
-LABEL maintainer="oatkrittin@gmail.com"
+LABEL maintainer="gxm.web@gmail.com"
 
-ENV SLURM_VERSION=18.08.3
-ENV MUNGE_VERSION=0.5.13
-ENV LMOD_VERSION=7.8
+ENV SLURM_VERSION=22.05.3
+ENV MUNGE_VERSION=0.5.15
+ENV LMOD_VERSION=8.7
 ENV USER_DEV=ansible
 ENV ROOT_HOME=/root
 ENV ROOT_RPMS=/root/rpmbuild/RPMS/x86_64
@@ -18,7 +18,8 @@ WORKDIR ${ROOT_HOME}
 RUN groupadd -r -g 982 slurm && \
     useradd -r -u 982 -g 982 -s /bin/false slurm && \
     useradd -u 3333 -ms /bin/bash $USER_DEV && \
-    usermod -aG wheel $USER_DEV
+    usermod -aG wheel $USER_DEV 
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
 
 # Add .ssh and correct permissions.
 ADD bootstrap/${USER_DEV}/.ssh /home/${USER_DEV}/.ssh
@@ -55,6 +56,8 @@ RUN yum -y update && \
     net-tools \
     telnet \
     bind-utils \
+    logrotate \
+    python3 \
     && \
     yum clean all && \
     rm -rf /var/cache/yum/*
@@ -67,8 +70,9 @@ RUN groupadd -g 983 munge && \
     useradd  -m -d /var/lib/munge -u 983 -g munge  -s /sbin/nologin munge
 
 # Install munge
-RUN wget https://github.com/dun/munge/releases/download/munge-${MUNGE_VERSION}/munge-${MUNGE_VERSION}.tar.xz && \
-    rpmbuild -tb --clean munge-${MUNGE_VERSION}.tar.xz && \ 
+COPY munge-${MUNGE_VERSION}.tar.xz .
+# RUN wget https://github.com/dun/munge/releases/download/munge-${MUNGE_VERSION}/munge-${MUNGE_VERSION}.tar.xz && \
+RUN    rpmbuild -tb --clean munge-${MUNGE_VERSION}.tar.xz && \ 
     rpm -ivh ${ROOT_RPMS}/munge-${MUNGE_VERSION}-1.el7.x86_64.rpm \
         ${ROOT_RPMS}/munge-libs-${MUNGE_VERSION}-1.el7.x86_64.rpm \
         ${ROOT_RPMS}/munge-devel-${MUNGE_VERSION}-1.el7.x86_64.rpm && \
@@ -84,8 +88,9 @@ RUN chown munge:munge /var/lib/munge && \
     systemctl enable munge
 
 # Build Slurm-* rpm packages ready for variant to pick and install
-RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
-    rpmbuild -ta --clean slurm-${SLURM_VERSION}.tar.bz2 && \
+COPY slurm/slurm-${SLURM_VERSION}.tar.bz2 .
+# RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
+RUN command    rpmbuild -ta --clean slurm-${SLURM_VERSION}.tar.bz2 && \
     rm -f slurm-${SLURM_VERSION}.tar.bz2
 
 RUN yum -y install epel-release && \
@@ -95,13 +100,15 @@ RUN yum -y install epel-release && \
     lua-filesystem \
     lua-devel \
     tcl \
+    tcl-devel \
     && \
     yum clean all && \
     rm -rf /var/cache/yum/*
 
 # Install Lmod
-RUN wget https://sourceforge.net/projects/lmod/files/Lmod-${LMOD_VERSION}.tar.bz2 && \
-    tar -xvjf Lmod-${LMOD_VERSION}.tar.bz2 && \
+COPY Lmod-${LMOD_VERSION}.tar.bz2 . 
+# RUN wget https://sourceforge.net/projects/lmod/files/Lmod-${LMOD_VERSION}.tar.bz2 && \
+RUN tar -xvjf Lmod-${LMOD_VERSION}.tar.bz2 && \
     cd Lmod-${LMOD_VERSION} && \
     ./configure --prefix=${APPS_ROOT_PATH} && \
     make install && \

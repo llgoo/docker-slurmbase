@@ -1,6 +1,6 @@
 ### Inspired by [GRomR1](https://github.com/GRomR1/docker-slurmbase), Data Driven HPC.
 
-Slurm Version 18.08.3
+Slurm Version 22.05.3
 # Things Included
  - syncronized UID, GID for slurm
  - ansible user.
