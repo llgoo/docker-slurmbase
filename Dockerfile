@@ -19,7 +19,6 @@ RUN groupadd -r -g 982 slurm && \
     useradd -r -u 982 -g 982 -s /bin/false slurm && \
     useradd -u 3333 -ms /bin/bash $USER_DEV && \
     usermod -aG wheel $USER_DEV 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
 
 # Add .ssh and correct permissions.
 ADD bootstrap/${USER_DEV}/.ssh /home/${USER_DEV}/.ssh
@@ -38,6 +37,7 @@ RUN chown -R ${USER_DEV}:wheel /home/${USER_DEV} && \
 # wget, net-tools, bind-tools(nslookup), telnet for debugging
 RUN yum -y update && \
     yum -y groupinstall "Development Tools" && \
+    yum -y install epel-release && \
     yum -y install \
     wget \
     ntp \
@@ -57,11 +57,21 @@ RUN yum -y update && \
     telnet \
     bind-utils \
     logrotate \
+    munge-libs \
+    munge-devel \
     python3 \
+    tzdata \
+    lua-posix \
+    lua \
+    lua-filesystem \
+    lua-devel \
+    tcl \
+    tcl-devel \
     && \
     yum clean all && \
     rm -rf /var/cache/yum/*
-
+    
+ENV TZ Asia/Shanghai
 RUN systemctl enable sshd && \
     systemctl enable ntpd
 
@@ -88,22 +98,10 @@ RUN chown munge:munge /var/lib/munge && \
     systemctl enable munge
 
 # Build Slurm-* rpm packages ready for variant to pick and install
-COPY slurm/slurm-${SLURM_VERSION}.tar.bz2 .
+COPY slurm-${SLURM_VERSION}.tar.bz2 .
 # RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
 RUN command    rpmbuild -ta --clean slurm-${SLURM_VERSION}.tar.bz2 && \
     rm -f slurm-${SLURM_VERSION}.tar.bz2
-
-RUN yum -y install epel-release && \
-    yum -y install \
-    lua-posix \
-    lua \
-    lua-filesystem \
-    lua-devel \
-    tcl \
-    tcl-devel \
-    && \
-    yum clean all && \
-    rm -rf /var/cache/yum/*
 
 # Install Lmod
 COPY Lmod-${LMOD_VERSION}.tar.bz2 . 
