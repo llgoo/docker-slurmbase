@@ -1,4 +1,4 @@
-FROM centos/systemd:latest
+FROM centos:centos7
 
 LABEL maintainer="gxm.web@gmail.com"
 
@@ -57,8 +57,6 @@ RUN yum -y update && \
     telnet \
     bind-utils \
     logrotate \
-    munge-libs \
-    munge-devel \
     python3 \
     tzdata \
     lua-posix \
@@ -72,8 +70,8 @@ RUN yum -y update && \
     rm -rf /var/cache/yum/*
     
 ENV TZ Asia/Shanghai
-RUN systemctl enable sshd && \
-    systemctl enable ntpd
+# RUN systemctl enable sshd && \
+#     systemctl enable ntpd
 
 # Create user `munge`
 RUN groupadd -g 983 munge && \
@@ -94,8 +92,8 @@ RUN chown munge:munge /var/lib/munge && \
     chown munge:munge /etc/munge/munge.key && \
     chown munge:munge /etc/munge && chmod 600 /var/run/munge && \
     chmod 755 /run/munge && \
-    chmod 600 /etc/munge/munge.key && \
-    systemctl enable munge
+    chmod 600 /etc/munge/munge.key 
+    # systemctl enable munge
 
 # Build Slurm-* rpm packages ready for variant to pick and install
 COPY slurm-${SLURM_VERSION}.tar.bz2 .
@@ -123,7 +121,5 @@ RUN groupadd -g 984 modules && \
     chown -R modules:modules ${MODULES_DIR} && \
     chmod a+rx ${MODULES_DIR}
 ADD bootstrap/etc/profile.d/z01_EasyBuild.sh /etc/profile.d/z01_EasyBuild.sh
-
-VOLUME [ "/etc/slurm" ]
 
 EXPOSE 22
